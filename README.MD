@@ -2,7 +2,7 @@
 
 This repo is intended to install and/or configure full-stack automation architecture.
 
-See posts about it on https://livio.zanol.com.br/
+See posts about it on https://livio.zanol.com.br/full-stack-it-automation-part-1
 
 Tested on Ubuntu 20.04.3 LT
 
@@ -26,7 +26,7 @@ Tested on Ubuntu 20.04.3 LT
 I recommend that you install it inside a virtual machine. You can use [virtual box](https://www.virtualbox.org/) or [Vmware Workstation](https://www.vmware.com/br/products/workstation-player.html) which I recommend between these 2.
 
 ## Information and Usage
-Please, consider reading the posts about full-stack automation before you do anything.
+Please, consider reading the [posts](https://livio.zanol.com.br/full-stack-it-automation-part-1) about full-stack automation before you do anything.
 
 These shell scripts will install AWX, Gitlab, 2 vaults and Gitlab runner in docker containers on your host. Also, if you execute the demo script, it will also install 3 more containers with a bastion host (for the API), the demo API and the demo UI based on React.
 
