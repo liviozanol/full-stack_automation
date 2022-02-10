@@ -1,0 +1,25 @@
+stages:
+  - build_job
+  - deploy_new_container
+
+
+build_job:
+  stage: build_job
+  image: docker:19.03.8
+  script:
+    - docker build -t fullstackapi_api .
+    
+
+deploy_new_container:
+  stage: deploy_new_container
+  image: docker:19.03.8
+  dependencies:
+    - build_job
+  before_script: #Installing curl and jq
+    - which curl || (apk --no-cache add curl)
+    - which jq || (apk --no-cache add jq)
+  script:
+    - "CURL_RESULT=`curl -sk -H \"X-Vault-Token: $VAULT_TWO_TOKEN\" \"$VAULT_TWO_URL/v1/secret/data/gitlab_secret\"`"
+    - "GITLAB_TOKEN=`echo $CURL_RESULT | jq -r .data.data.gitlab_token`"
+    - docker ps -a | grep "fullstackapi_api" | cut -f1 -d' ' | xargs -n1 -r docker rm -f || echo ""
+    - docker run -itd --restart=unless-stopped -p 10042:8000 -e FULLSTACK_AUTO_GITLAB_URL="$GITLAB_URL" -e FULLSTACK_AUTO_GITLAB_TOKEN="$GITLAB_TOKEN" -e FULLSTACK_AUTO_VAULT_URL="$VAULT_TWO_URL" -e FULLSTACK_AUTO_VAULT_TOKEN="$VAULT_TWO_TOKEN" fullstackapi_api:latest

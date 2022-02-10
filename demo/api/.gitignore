@@ -1,0 +1,7 @@
+id_rsa_fullstack
+*.log*
+*~
+*.pyc
+*.key
+__pycache__
+*pycache*

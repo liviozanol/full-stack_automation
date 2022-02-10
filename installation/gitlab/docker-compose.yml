@@ -1,0 +1,35 @@
+services:
+  #Service "gitlab" creates and run the gitlab instance.
+  gitlab:
+    image: 'gitlab/gitlab-ce:14.7.1-ce.0'
+    restart: always
+    container_name: 'gitlab_fullstack_automation'
+    hostname: 'gitlab'
+    environment:
+      #Set an initial root password and disable https. set external URL to localhost
+      #sidekiq['concurrency'] = 10 : reduces RAM memory usage
+      #prometheus_monitoring['enable'] = false : disables monitoring and save disk usage and CPU and RAM
+      #postgresql['shared_buffers'] = "512MB" : reduces RAM memory usage
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://127.0.0.1:10000'
+        gitlab_rails['initial_root_password'] = 'fullstackautomationrootpass'
+        nginx['listen_port'] = 80
+        nginx['listen_https'] = false
+        prometheus_monitoring['enable'] = false
+        sidekiq['concurrency'] = 10
+        postgresql['shared_buffers'] = "512MB"
+    ports:
+      #Only listen on HTTP exposed port
+      - '10000:80'
+      #- '10443:443'
+      #- '10022:22'
+    volumes:
+      - '/srv/gitlab/config:/etc/gitlab'
+      - '/srv/gitlab/logs:/var/log/gitlab'
+      - '/srv/gitlab/data:/var/opt/gitlab'
+      #Temp volume just to run the script to create users
+      - './scripts:/tmp/scripts'
+
+#References:
+#https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html#programmatically-creating-a-personal-access-token
+#https://forum.gitlab.com/t/logging-in-from-the-api/48384/14

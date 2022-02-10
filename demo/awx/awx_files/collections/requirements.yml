@@ -1,0 +1,11 @@
+collections:
+  - name: junipernetworks.junos
+    source: https://galaxy.ansible.com
+  - name: cisco.ios
+    source: https://galaxy.ansible.com
+  - name: arista.eos
+    source: https://galaxy.ansible.com
+  - name: cisco.iosxr
+    source: https://galaxy.ansible.com
+  - name: ansible.netcommon #to have netaddr and be able to use ipaddr filter on jinja2
+    source: https://galaxy.ansible.com

@@ -1,0 +1,6 @@
+uvicorn==0.17.4
+starlette==0.17.1
+pydantic==1.9.0
+fastapi==0.73.0
+netaddr==0.7.19
+requests==2.22.0

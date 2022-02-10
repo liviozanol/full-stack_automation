@@ -1,0 +1,24 @@
+stages:
+  - build_job
+  - deploy_new_container
+
+
+build_job:
+  stage: build_job
+  image: docker:19.03.8
+  before_script: #Installing npm
+    - which npm || (apk --no-cache add npm)
+  script:
+    - npm install
+    - CI=false npm run build #Yes. Ignoring Warnings... It helps me finish this faster. Should be removed on production
+    - docker build -t fullstackapi_ui .
+    
+
+deploy_new_container:
+  stage: deploy_new_container
+  image: docker:19.03.8
+  dependencies:
+    - build_job
+  script:
+    - docker ps -a | grep "fullstackapi_ui" | cut -f1 -d' ' | xargs -n1 -r docker rm -f || echo ""
+    - docker run -itd --restart=unless-stopped -p 80:80 fullstackapi_ui:latest

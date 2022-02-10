@@ -1,0 +1,38 @@
+image: alpine:3.15.0
+
+before_script: #Installing curl and jq
+  - which curl || (apk --no-cache add curl)
+  - which jq || (apk --no-cache add jq)
+
+run:
+  script:
+    - PLAYBOOK_NAME="wan_automation_workflow_template"
+    #Getting credentials from vault
+    - "CURL_RESULT=`curl -sk -H \"X-Vault-Token: $VAULT_TWO_TOKEN\" \"$VAULT_TWO_URL/v1/secret/data/awx_secret\"`"
+    - "AWX_USER=`echo $CURL_RESULT | jq -r .data.data.awx_user`"
+    - "AWX_PASS=`echo $CURL_RESULT | jq -r .data.data.awx_pass`"
+    - AWX_URL="https://$AWX_USER:$AWX_PASS@$AWX_ADDRESS_PORT"
+    #Querying AWX API to get workflow job template ID
+    - "JOB_TEMPLATE_ID=`curl -sk $AWX_URL/api/v2/workflow_job_templates/?search=$PLAYBOOK_NAME | jq .results[].id`"
+    #Calling AWX API to run our workflow
+    - "JOB_ID=`curl --header \"Content-Type: application/json\" -sk $AWX_URL/api/v2/workflow_job_templates/$JOB_TEMPLATE_ID/launch/ --data \"{\\\"extra_vars\\\":$(cat wan_site_data.json)}\" | jq .id`"
+    #Monitoring workflow
+    #COUNT is used as a protection so we don't have ifnite loops
+    - COUNT=0
+    - MAX_COUNT=80
+    - >
+      while true; do
+        JOB_STATUS_TEXT=`curl -sk $AWX_URL/api/v2/workflow_jobs/$JOB_ID/ | jq -r .status`
+        if [ "$JOB_STATUS_TEXT" == "successful" ]; then
+          exit 0
+        fi
+        if [ "$JOB_STATUS_TEXT" == "failed" ]; then
+          exit 1
+        fi
+        sleep 5
+        COUNT=$(( COUNT + 1 ))
+        if [ "$COUNT" -gt "$MAX_COUNT" ]; then
+          echo "protection against infinite loop reached. aborting"
+          exit 1
+        fi
+      done;

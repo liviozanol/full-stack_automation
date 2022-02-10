@@ -1,0 +1,11 @@
+---
+- name: This only set the router OS name on a variable to use on the next task, since 'import_playbook' can't read vars from hosts and is read static (before play)
+  hosts: "{{ site_id }}"
+  gather_facts: false
+  tasks:
+    - name: Set router os
+      set_stats:
+        data:
+          router_os:  "{{ ansible_network_os }}"
+      register: router_os
+      delegate_to: 127.0.0.1

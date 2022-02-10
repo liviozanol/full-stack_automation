@@ -1,0 +1,54 @@
+{
+    "site_id": "site_1",
+    "custom_site_name": "site_1_teste",
+    "lan_interfaces": [{
+        "interface_name": "ethernet 0/1",
+        "ip_address": "192.168.0.1/24",
+        "description": "descricao",
+        "helper_address": "192.168.0.5",
+        "in_acl": [{
+                "action": "allow",
+                "src": "8.8.8.8/32",
+                "dst": "1.1.1.0/24",
+                "protocol": "udp",
+                "port": "1-65535"
+            },
+            {
+                "action": "allow",
+                "src": "8.8.8.0/24",
+                "dst": "1.1.1.1/32",
+                "protocol": "icmp",
+                "port": ""
+            },
+            {
+                "action": "allow",
+                "src": "any",
+                "dst": "1.1.1.0/24",
+                "protocol": "ip",
+                "port": ""
+            },
+            {
+                "action": "allow",
+                "src": "8.8.8.8/32",
+                "dst": "1.1.1.1/32",
+                "protocol": "tcp",
+                "port": "80"
+            }
+        ],
+        "out_acl": [{
+                "action": "allow",
+                "src": "8.8.0.0/16",
+                "dst": "any",
+                "protocol": "gre",
+                "port": ""
+            },
+            {
+                "action": "allow",
+                "src": "8.8.8.8/32",
+                "dst": "1.1.1.1/32",
+                "protocol": "udp",
+                "port": "80"
+            }
+        ]
+    }]
+}

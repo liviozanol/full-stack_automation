@@ -1,0 +1,58 @@
+{
+    "site_id": "site_1asdfdasfsa",
+    "custom_site_name": "nome customizado",
+    "lan_interfaces": [
+      {
+        "interface_name": "gigabitethernet 0/1",
+        "ip_address": "192.168.0.111/24",
+        "description": "descricao-_a",
+        "helper_address": "192.168.0.253",
+        "in_acl": [
+          {
+            "action": "deny",
+            "src": "192.168.0.5/32",
+            "dst": "1.1.1.0/24",
+            "protocol": "udp",
+            "port": "1-65535"
+          },
+          {
+            "action": "deny",
+            "src": "8.8.8.0/24",
+            "dst": "192.168.0.9/32",
+            "protocol": "icmp",
+            "port": ""
+          },
+          {
+            "action": "deny",
+            "src": "any",
+            "dst": "192.168.0.200/32",
+            "protocol": "icmp",
+            "port": ""
+          },
+          {
+            "action": "allow",
+            "src": "8.8.8.8/32",
+            "dst": "192.168.0.128/25",
+            "protocol": "tcp",
+            "port": "80"
+          }
+        ],
+        "out_acl": [
+          {
+            "action": "allow",
+            "src": "192.168.0.1/32",
+            "dst": "any",
+            "protocol": "gre",
+            "port": ""
+          },
+          {
+            "action": "allow",
+            "src": "8.8.8.8/32",
+            "dst": "192.168.0.10/32",
+            "protocol": "udp",
+            "port": "80"
+          }
+        ]
+      }
+    ]
+  }

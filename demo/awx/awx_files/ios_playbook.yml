@@ -1,0 +1,101 @@
+---
+- name: Create ACLs
+  hosts: '{{ site_id }}'
+  gather_facts: no
+  tasks:
+  - name: Main Block
+    block:
+      - name: pip install netaddr (really disagree how red hat manage their products...). Either I do this or create a custom Execution Enviroment....
+        ansible.builtin.shell: pip install netaddr
+        delegate_to: 127.0.0.1
+
+      - name: Parsing in and out ACEs and setting fact
+        ansible.builtin.set_fact:
+          in_aces: "{{ lookup('template', './ios_template.j2', template_vars=dict(aces=lan_interfaces[0].in_acl)).splitlines() }}"
+          out_aces: "{{ lookup('template', './ios_template.j2', template_vars=dict(aces=lan_interfaces[0].out_acl)).splitlines() }}"
+        delegate_to: localhost
+              
+      - name: Get running config interface section
+        cisco.ios.ios_command:
+          commands:
+            - show running-config | sec interface {{ lan_interfaces[0].interface_name }}
+        register: acl_name
+
+      - name: Get ACL IN Name
+        ansible.builtin.set_fact:
+          in_acl: "{{ acl_name.stdout_lines[0] | select('match', '^\\s*ip\\s+access-group\\s+(.*)in') | map('regex_replace', '^\\s*ip\\s+access-group\\s+(.*)\\s+in.*$','\\1') }}" 
+          #this regex will capture the ACL name (a string between word 'access-group' and word 'in')
+      - name: Get ACL OUT Name
+        ansible.builtin.set_fact:
+          out_acl: "{{ acl_name.stdout_lines[0] | select('match', '^\\s*ip\\s+access-group\\s+(.*)out') | map('regex_replace', '^\\s*ip\\s+access-group\\s+(.*)\\s+out.*$','\\1') }}" 
+
+      #To get ansible_date_time and epoch
+      - setup:
+          gather_subset:
+            - min
+      #- debug:
+      #    var: vars
+      #To get ansible_date_time and epoch
+
+      - name: Creating IN ACL
+        cisco.ios.ios_config:
+          lines:
+            "{{ in_aces }}"
+          parents: "ip access-list extended wan_site_{{ ansible_date_time.epoch }}_in"
+      - name: Creating OUT ACL
+        cisco.ios.ios_config:
+          lines:
+            "{{ in_aces }}"
+          parents: "ip access-list extended wan_site_{{ ansible_date_time.epoch }}_out"
+      
+      - name: Attaching ACL to interface
+        cisco.ios.ios_config:
+          lines:
+            - "ip access-group wan_site_{{ ansible_date_time.epoch }}_in in"
+            - "ip access-group wan_site_{{ ansible_date_time.epoch }}_out out"
+          parents: "interface {{ lan_interfaces[0].interface_name }}"
+      
+      - name: Deleting old IN ACL
+        cisco.ios.ios_config:
+          lines:
+            - "no ip access-list extended {{ in_acl[0] }}"
+        when: in_acl[0] is defined and in_acl[0] | length > 0
+      - name: Deleting old OUT ACL
+        cisco.ios.ios_config:
+          lines:
+            - "no ip access-list extended {{ out_acl[0] }}"
+        when: out_acl[0] is defined and out_acl[0] | length > 0
+    when: lan_interfaces[0].in_acl is defined and lan_interfaces[0].in_acl | length > 0 and lan_interfaces[0].out_acl is defined and lan_interfaces[0].out_acl | length > 0
+
+- name: Setting other changes
+  hosts: '{{ site_id }}'
+  gather_facts: no
+  tasks:
+    - name: Parsing "IP/Mask" to "IP Mask (dot decimal formation)"
+      set_fact:
+        ip_mask: "{{ lan_interfaces[0].ip_address | ansible.netcommon.ipaddr('address') }} {{ lan_interfaces[0].ip_address | ansible.netcommon.ipaddr('netmask') }}"
+      delegate_to: localhost
+      when: lan_interfaces[0].ip_address is defined and lan_interfaces[0].ip_address | length > 0
+
+    - name: Changing IP address
+      cisco.ios.ios_config:
+        lines:
+          - "ip address {{ ip_mask }}"
+        parents: "interface {{ lan_interfaces[0].interface_name }}"
+      when: lan_interfaces[0].ip_address is defined and lan_interfaces[0].ip_address | length > 0
+    
+    - name: Changing Description
+      cisco.ios.ios_config:
+        lines:
+          - "description {{ lan_interfaces[0].description }}"
+        parents: "interface {{ lan_interfaces[0].interface_name }}"
+      when: lan_interfaces[0].description is defined and lan_interfaces[0].description | length > 0
+    
+    - name: Changing Helper Address
+      cisco.ios.ios_config:
+        lines:
+          - "ip helper-address {{ lan_interfaces[0].helper_address }}"
+        parents: "interface {{ lan_interfaces[0].interface_name }}"
+      when: lan_interfaces[0].helper_address is defined and lan_interfaces[0].helper_address | length > 0
+
+

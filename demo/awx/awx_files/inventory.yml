@@ -1,0 +1,35 @@
+all:
+  vars:
+    dumb_var: you_can_have_you_global_var_here_including_ssh_args
+    ansible_user: test #ansible SSH user
+    ansible_ssh_common_args: '-o ControlPersist=60s -o ConnectTimeout=300 -o StrictHostKeyChecking=no' #just to test... on production, remove this
+    ansible_ssh_private_key_file: ./id_rsa_fullstack.key #Key to use to login
+  children:
+    ROUTERS_US:
+      vars:
+        dumb_var2: you_can_have_you_group_var_here_including_ssh_args
+      hosts:
+        site_1:
+          vars:
+            dumb_var3: you_can_have_you_host_var_here_including_ssh_args
+          ansible_host: 127.0.0.66 #device IP that accepts SSH from ansible (or from bastion/jump host)
+          ansible_port: 2222 #SSH listenport
+          ansible_connection: network_cli #ansible connection type
+          ansible_network_os: ios #variable with device OS that can be used later on our playbook to convert a propper template file
+        site_3:
+          ansible_host: 127.0.0.1
+          ansible_port: 10322
+          ansible_connection: network_cli
+          ansible_network_os: junos
+    ROUTERS_ASIA:
+      hosts:
+        site_2:
+          ansible_host: 127.0.0.1
+          ansible_port: 10222
+          ansible_connection: network_cli
+          ansible_network_os: eos
+        site_4:
+          ansible_host: 127.0.0.1
+          ansible_port: 10422
+          ansible_connection: network_cli
+          ansible_network_os: iosxr

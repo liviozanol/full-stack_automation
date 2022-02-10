@@ -1,0 +1,28 @@
+services:
+  vault1: #vault that will store automated elements key/pass
+    image: vault:1.9.0
+    container_name: vault1
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_API_ADDR: "http://0.0.0.0:8200"
+      VAULT_ADDR: 'http://127.0.0.1:8200'
+      VAULT_DEV_ROOT_TOKEN_ID: "fullstackautomation-root-token"
+      VAULT_LOCAL_CONFIG: '{"backend": {"file": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h", "ui": true}'
+    restart: always
+    cap_add:
+      - IPC_LOCK
+  vault2: #vault that will store gitlab and awx token
+    image: vault:1.9.0
+    container_name: vault2
+    ports:
+      - "9200:8200"
+    environment:
+      VAULT_API_ADDR: "http://0.0.0.0:9200"
+      VAULT_ADDR: 'http://127.0.0.1:8200'
+      VAULT_DEV_ROOT_TOKEN_ID: "fullstackautomation-root-token-vault2"
+      VAULT_TOKEN: "fullstackautomation-root-token-vault2"
+      VAULT_LOCAL_CONFIG: '{"backend": {"file": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h", "ui": true}'
+    restart: always
+    cap_add:
+      - IPC_LOCK

@@ -1,0 +1,38 @@
+#jinja2:lstrip_blocks: True
+{% for item in aces %}
+    {#Check if source or dst IP address are IP/MASK or 'any' and set wildcard mask#}
+    {%- if item.src != 'any' -%}
+        {%- set src_wildcard = item.src | ansible.netcommon.ipaddr('wildcard') -%}
+    {%- endif -%}
+    {%- if item.dst != 'any' -%}
+        {%- set dst_wildcard = item.dst | ansible.netcommon.ipaddr('wildcard') -%}
+    {%- endif -%}
+    {##################}
+    {#Make initial statement (e.g.: "permit ip")#}
+    {{- item.action }}{{ ' ' + item.protocol -}}
+    {##################}
+    {#Setting src address (e.g.: "any" or "192.168.254.0 0.0.0.255")#}
+    {%- if item.src == 'any' -%}
+        {{- ' ' + item.src -}}
+    {%- else -%}
+        {{- ' ' + item.src | ansible.netcommon.ipaddr('network') }}{{ ' ' + src_wildcard -}}
+    {%- endif -%}
+    {##################}
+    {#Setting dst address (e.g.: "any" or "192.168.254.0 0.0.0.255")#}
+    {%- if item.dst == 'any' -%}
+        {{- ' ' + item.dst -}}
+    {%- else -%}
+        {{- ' ' + item.dst | ansible.netcommon.ipaddr('network') }}{{ ' ' + dst_wildcard -}}
+    {%- endif -%}
+    {##################}
+    {#Setting dst port (e.g.: "123" or "range 1 123"). If port contains "-" char its a range#}
+    {%- if '-' in item.port -%}
+        {% set range_initial_port, range_final_port = item.port.split('-') %}
+        {{- ' range ' + range_initial_port + ' ' + range_final_port -}}
+    {%- else -%}
+        {%- if item.protocol == 'udp' or item.protocol == 'tcp' -%}
+            {{- ' eq ' + item.port -}}
+        {%- endif -%}
+    {%- endif -%}
+    {{ ' ' }}
+{% endfor %}
