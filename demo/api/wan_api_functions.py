@@ -233,7 +233,7 @@ def validate_data_sent_by_user(current_data,new_data):
 
     #just to keep a record to easy read on the demo, will not be used here. On production code can be removed.
     #just to keep a record to easy read on the demo, will not be used here. On production code can be removed.
-    acl_action_regex    = "^(allow|deny)$"
+    acl_action_regex    = "^(permit|deny)$"
     acl_src_dst_regex   = "^(^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\/([1-9]|[1-2][0-9]|3[0-2])$|any$)"
     acl_protocol_regex  = "^(tcp|udp|icmp|ip|gre)$"
     acl_port_regex      = "^[0-9]{1,5}-[0-9]{1,5}$|^(?![\s\S])$|^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
@@ -351,7 +351,7 @@ def validate_acl(acl,interface_ip_address):
         ValueError: if any value is not validated
     """
 
-    acl_action_regex    = "^(allow|deny)$"
+    acl_action_regex    = "^(permit|deny)$"
     acl_src_dst_regex   = "^(^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\/([1-9]|[1-2][0-9]|3[0-2])$|any$)"
     acl_protocol_regex  = "^(tcp|udp|icmp|ip|gre)$"
     acl_port_regex      = "^[0-9]{1,5}-[0-9]{1,5}$|^(?![\s\S])$|^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"

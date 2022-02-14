@@ -46,7 +46,7 @@ export const WansitesList = props => (
 
 
 const action_choices = [
-    {id: "allow",name:"allow"},
+    {id: "permit",name:"permit"},
     {id: "deny" ,name:"deny"},
 ];
 const protocol_choices = [
@@ -63,7 +63,7 @@ const string_regex        = /^([a-zA-Z0-9_\-\s]{1,20}|)$/;
 const interface_ip_regex  = /^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\/([1-9]|[1-2][0-9]|3[0-1])$/;
 const helper_address_regex= /^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/;
 
-const acl_action_regex    = /^(allow|deny)$/;
+const acl_action_regex    = /^(permit|deny)$/;
 const acl_src_dst_regex   = /^(^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\/([1-9]|[1-2][0-9]|3[0-2])$|any$)/;
 const acl_protocol_regex  = /^(tcp|udp|icmp|ip|gre)$/;
 const acl_port_regex      = /^[0-9]{1,5}-[0-9]{1,5}$|^(?![\s\S])$|^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/;
@@ -71,7 +71,7 @@ const acl_port_regex      = /^[0-9]{1,5}-[0-9]{1,5}$|^(?![\s\S])$|^([0-9]{1,4}|[
 const validateStringRegex     = regex(string_regex,         'Field must match regex '+string_regex);
 const validateInterfaceRegex  = regex(interface_ip_regex,   'Must be IP/MASK');
 const validateHelperRegex     = regex(helper_address_regex, 'Invalid IP Address');
-const validateACLActionRegex  = regex(acl_action_regex,     'Action must be either allow or deny');
+const validateACLActionRegex  = regex(acl_action_regex,     'Action must be either permit or deny');
 const validateSrcDstRegex     = regex(acl_src_dst_regex,    'Src/Dst must be IP/MASK or "any"');
 const validateProtocolRegex   = regex(acl_protocol_regex,   'Invalid Protocol');
 const validatePortRegex       = regex(acl_port_regex,       'Invalid Port. Should be single port or range (eg.: 80 or 80-443)');
